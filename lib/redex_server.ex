@@ -9,7 +9,7 @@ defmodule Redex.Server do
 
   ## Examples
 
-      iex> Redex.Server.start_link()
+      iex> Redex.Server.start_link([])
       {:ok, #PID<0.102.0>}
 
   """
@@ -34,21 +34,22 @@ defmodule Redex.Server do
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    serve(client)
+    Logger.debug "new client"
+    handle_client(client)
     loop_acceptor(socket)
   end
 
-  defp serve(socket) do
-    socket
-    |> read_line()
-    |> write_line(socket)
-
-    serve(socket)
+  defp handle_client(socket) do
+    case socket |> read_line() do
+      {:ok, line} ->
+        write_line(line, socket)
+        handle_client(socket)
+      {:error, error} -> Logger.debug "connection closed: #{error}"
+    end
   end
 
   defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    data
+    :gen_tcp.recv(socket, 0)
   end
 
   defp write_line(line, socket) do
