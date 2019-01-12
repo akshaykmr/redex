@@ -35,7 +35,7 @@ defmodule Redex.Server do
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     Logger.debug "new client"
-    handle_client(client)
+    Task.start_link(fn -> handle_client(client) end)
     loop_acceptor(socket)
   end
 
