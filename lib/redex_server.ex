@@ -1,7 +1,7 @@
 defmodule Redex.Server do
   require Logger
   @moduledoc """
-  A naive redis-server
+  little redis-server
   """
 
   @doc """
@@ -42,7 +42,8 @@ defmodule Redex.Server do
   defp handle_client(socket) do
     case socket |> read_line() do
       {:ok, line} ->
-        write_line(line, socket)
+        IO.inspect line
+        write_line("+PONG\r\n", socket)
         handle_client(socket)
       {:error, error} -> Logger.debug "connection closed: #{error}"
     end
