@@ -14,9 +14,11 @@ defmodule Redex.TestUtils do
             :timer.sleep(100)
             wait(host, port, retries - 1)
           :true ->
-            Mix.raise "Cannot connect to server" <>
-                  " (#{host}:#{port}):" <>
-                  " #{:inet.format_error(reason)}"
+            Mix.raise """
+              Cannot connect to server
+              (#{host}:#{port}):
+              #{:inet.format_error(reason)}
+              """
         end
     end
   end

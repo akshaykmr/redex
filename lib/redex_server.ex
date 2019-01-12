@@ -35,7 +35,7 @@ defmodule Redex.Server do
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     Logger.debug "new client"
-    Task.start_link(fn -> handle_client(client) end)
+    Task.start(fn -> handle_client(client) end)
     loop_acceptor(socket)
   end
 
@@ -45,7 +45,9 @@ defmodule Redex.Server do
         IO.inspect line
         write_line("+PONG\r\n", socket)
         handle_client(socket)
-      {:error, error} -> Logger.debug "connection closed: #{error}"
+      {:error, error} ->
+        :gen_tcp.close(socket)
+        Logger.debug "connection closed: #{error}"
     end
   end
 
