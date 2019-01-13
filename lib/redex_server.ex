@@ -35,19 +35,34 @@ defmodule Redex.Server do
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     Logger.debug "new client"
+
+    # TODO: should use a supervisor here
     Task.start(fn -> handle_client(client) end)
     loop_acceptor(socket)
   end
 
-  defp handle_client(socket) do
-    case socket |> read_line() do
+  defp close_connection(socket, reason) do
+    :gen_tcp.close(socket)
+    Logger.debug "connection closed: #{reason}"
+  end
+
+  defp handle_client(socket, resume \\ nil) do
+    case socket |> read_line()  do
       {:ok, line} ->
-        IO.inspect line
-        write_line("+PONG\r\n", socket)
-        handle_client(socket)
-      {:error, error} ->
-        :gen_tcp.close(socket)
-        Logger.debug "connection closed: #{error}"
+        try do
+          line = String.trim(line)
+          result = if resume == nil do Redex.RESPDecoder.read(line) else resume.(line) end
+
+          if is_function(result) do
+            handle_client(socket, result)
+          else
+            result |> Redex.Command.execute |> write_line(socket)
+            handle_client(socket)
+          end
+        rescue
+          e in RuntimeError -> close_connection(socket, e.message)
+        end
+      {:error, error} -> close_connection(socket, error)
     end
   end
 

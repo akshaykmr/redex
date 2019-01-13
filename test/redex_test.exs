@@ -38,4 +38,9 @@ defmodule RedexServerTest do
     {:ok, conn2} = get_connection()
     assert Redix.command!(conn2, ["PING"]) == "PONG"
   end
+
+  test "it can handle mutiple commands from same client", %{conn: conn} do
+    assert Redix.command!(conn, ["PING"]) == "PONG"
+    assert Redix.command!(conn, ["PING"]) == "PONG"
+  end
 end
