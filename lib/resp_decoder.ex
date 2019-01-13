@@ -5,6 +5,10 @@ defmodule Redex.RESPDecoder do
 
   @decode_error_message "RESP decode error"
 
+  def read(start) do
+    Redex.RESPDecoder.parse_line(start, &(&1))
+  end
+
 
   def parse_int!(str) do
     {int, _} = Integer.parse(str)
@@ -51,6 +55,5 @@ defmodule Redex.RESPDecoder do
       end
     end
   end
-
 end
 
