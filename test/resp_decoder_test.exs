@@ -15,8 +15,7 @@ defmodule RESPDecoderTest do
   end
 
   test "it can read bulk string" do
-    next = parse_line("$4", &(&1))
-    assert "Blah" == next.("Blah")
+    assert parse_line("$4", &(&1)).("Blah") == "Blah"
   end
 
   test "it raises error for invalid protocol" do
@@ -28,22 +27,37 @@ defmodule RESPDecoderTest do
   end
 
   test "it can read 1 element array" do
-    next = parse_line("*1", &(&1))
-    assert next.(":4") == [4]
+    assert parse_line("*1", &(&1)).(":4") == [4]
   end
 
   test "it can read n element array" do
-    next = parse_line("*3", &(&1))
-    next = next.(":90")
-    next = next.(":11")
-    assert next.(":124") == [90, 11, 124]
+    assert parse_line("*3", &(&1)).(":90").(":11").(":124") == [90, 11, 124]
   end
 
   test "it can read array of bulk strings" do
-    next = parse_line("*2", &(&1))
-    next = next.("$4")
-    next = next.("It's")
-    next = next.("$8")
-    assert next.("Working!") == ["It's", "Working!"]
+    assert parse_line("*2", &(&1)).("$4").("It's").("$8").("Working!") == ["It's", "Working!"]
+  end
+
+  test "it can read mixed n element array" do
+    result = parse_line("*5", &(&1))
+              .(":42")
+              .("+The")
+              .("$6")
+              .("answer")
+              .("+to")
+              .("$4")
+              .("life")
+    assert result == [42, "The", "answer", "to", "life"]
+  end
+
+  test "it can read nested arrays" do
+    result = parse_line("*2", &(&1))
+              .("*2")
+              .("+Mojo")
+              .("+Jojo")
+              .("*2")
+              .("+Professor")
+              .("+X")
+    assert result  == [["Mojo", "Jojo"], ["Professor", "X"]]
   end
 end
