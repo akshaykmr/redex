@@ -6,7 +6,7 @@ defmodule Redex.RESPDecoder do
   @decode_error_message "RESP decode error"
 
   def read(start) do
-    Redex.RESPDecoder.parse_line(start, &(&1))
+    parse_line(start, &(&1))
   end
 
 
@@ -15,7 +15,7 @@ defmodule Redex.RESPDecoder do
     int
   end
 
-  def parse_line(line, callback \\ :nil) do
+  defp parse_line(line, callback) do
     case line do
       "+" <> str -> callback.(str)
 
@@ -29,7 +29,7 @@ defmodule Redex.RESPDecoder do
     end
   end
 
-  def parse_bulk_string(len, str, callback) do
+  defp parse_bulk_string(len, str, callback) do
     cond do
       str == "-1" -> callback.(nil)
       byte_size(str) == len -> callback.(str)
@@ -37,7 +37,7 @@ defmodule Redex.RESPDecoder do
     end
   end
 
-  def array_parser(len, callback, accumulator \\ []) do
+  defp array_parser(len, callback, accumulator \\ []) do
     if length(accumulator) == len do
       callback.(accumulator)
     else

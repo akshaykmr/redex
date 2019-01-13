@@ -48,8 +48,23 @@ defmodule RedexServerTest do
     assert Redix.command!(conn, ["ECHO", "HEY!"]) == "HEY!"
   end
 
-  test "set and get command", %{conn: conn} do
+  test "set and get", %{conn: conn} do
     assert Redix.command!(conn, ["SET", "mykey", "somevalue"]) == "OK"
     assert Redix.command!(conn, ["GET", "mykey"]) == "somevalue"
+  end
+
+  test "set and get when expiry in seconds", %{conn: conn} do
+    assert Redix.command!(conn, ["SET", "mykey", "somevalue", "ex", "1"]) == "OK"
+    assert Redix.command!(conn, ["GET", "mykey"]) == "somevalue"
+    # TODO: remove sleep
+    :timer.sleep(1000)
+    assert Redix.command!(conn, ["GET", "mykey"]) == nil
+  end
+
+  test "set and get when expiry in milliseconds", %{conn: conn} do
+    assert Redix.command!(conn, ["SET", "mykey", "somevalue", "px", "10"]) == "OK"
+    assert Redix.command!(conn, ["GET", "mykey"]) == "somevalue"
+    :timer.sleep(10)
+    assert Redix.command!(conn, ["GET", "mykey"]) == nil
   end
 end
