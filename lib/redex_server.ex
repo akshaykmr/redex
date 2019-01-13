@@ -14,6 +14,7 @@ defmodule Redex.Server do
 
   """
   def start_link args do
+    Redex.KV.start_link()
     Task.start_link(fn -> Redex.Server.accept(args) end)
   end
 

@@ -8,6 +8,13 @@ defmodule Redex.Command do
       "COMMAND" -> encode({:simple_str, "OK"})
       "PING" -> encode({:simple_str, "PONG"})
       "ECHO" -> encode({:simple_str, Enum.at(args, 0)})
+      "SET" ->
+        [key, value] = args
+        Redex.KV.set(key, value)
+        encode({:simple_str, "OK"})
+      "GET" ->
+        [key] = args
+        encode({:bulk_str, Redex.KV.get(key)})
       _ ->
           IO.inspect [command] ++ args
         raise @invalid_command_message
