@@ -43,4 +43,13 @@ defmodule RedexServerTest do
     assert Redix.command!(conn, ["PING"]) == "PONG"
     assert Redix.command!(conn, ["PING"]) == "PONG"
   end
+
+  test "echo command", %{conn: conn} do
+    assert Redix.command!(conn, ["ECHO", "HEY!"]) == "HEY!"
+  end
+
+  test "set and get command", %{conn: conn} do
+    assert Redix.command!(conn, ["SET", "mykey", "somevalue"]) == "OK"
+    assert Redix.command!(conn, ["GET", "mykey"]) == "somevalue"
+  end
 end
