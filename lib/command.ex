@@ -1,13 +1,16 @@
 defmodule Redex.Command do
-  @crlf "\r\n"
+  import Redex.RESPEncoder
   @invalid_command_message "Command invalid or not implemented"
 
 
-  def execute([command | _args]) do
+  def execute([command | args]) do
     case command |> String.upcase do
-      "COMMAND" -> "+OK" <> @crlf
-      "PING" -> "+PONG" <> @crlf
-      _ -> raise @invalid_command_message
+      "COMMAND" -> encode({:simple_str, "OK"})
+      "PING" -> encode({:simple_str, "PONG"})
+      "ECHO" -> encode({:simple_str, Enum.at(args, 0)})
+      _ ->
+          IO.inspect [command] ++ args
+        raise @invalid_command_message
     end
   end
 end
