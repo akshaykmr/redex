@@ -10,9 +10,7 @@ defmodule Redex.Command do
       "ECHO" -> {:simple_str, Enum.at(args, 0)}
       "SET" -> set(args)
       "GET" -> get(Enum.at(args, 0))
-      _ ->
-          IO.inspect [command] ++ args
-        raise @invalid_command_message
+      _ -> raise @invalid_command_message
     end
   end
 
@@ -21,7 +19,6 @@ defmodule Redex.Command do
   end
 
   def set(args) do
-    IO.inspect args
     case args do
       [key, value] ->
         Redex.KV.set(key, %{value: value})

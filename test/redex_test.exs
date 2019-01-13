@@ -10,7 +10,6 @@ defmodule RedexServerTest do
   end
 
   setup do
-    IO.puts "starting server"
     {:ok, server} = Redex.Server.start_link([port: @test_port])
     %{pid: server}
   end
