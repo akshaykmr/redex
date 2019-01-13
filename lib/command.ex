@@ -30,6 +30,7 @@ defmodule Redex.Command do
           "PX" -> Time.add(now, delta, :millisecond)
         end
         Redex.KV.set(key, %{value: value, expires: expires})
+      _ -> raise @invalid_command_message
     end
     {:simple_str, "OK"}
   end
