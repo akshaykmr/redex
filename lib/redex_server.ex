@@ -57,7 +57,11 @@ defmodule Redex.Server do
           if is_function(result) do
             handle_client(socket, result)
           else
-            result |> Redex.Command.execute |> write_line(socket)
+            result
+            |> Redex.Command.execute
+            |> Redex.Command.encode_response
+            |> write_line(socket)
+
             handle_client(socket)
           end
         rescue

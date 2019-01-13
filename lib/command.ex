@@ -13,7 +13,11 @@ defmodule Redex.Command do
       _ ->
           IO.inspect [command] ++ args
         raise @invalid_command_message
-    end |> encode
+    end
+  end
+
+  def encode_response(response) do
+    encode(response)
   end
 
   def set(args) do
